@@ -11,7 +11,7 @@ import os
 import numpy as np
 import uvicorn
 from fastapi import FastAPI
-from scipy.stats import binom
+from scipy.stats import binom # type: ignore
 
 app = FastAPI()
 
