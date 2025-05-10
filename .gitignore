@@ -1,4 +1,7 @@
 .DS_Store
+.*.swp
 __pycache__/
 .venv/
 .mypy_cache/
+server.log
+solution.zip
