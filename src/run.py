@@ -1,10 +1,11 @@
-import requests
+import call_server
 import measure
 
-#TODO move to a server_wrapper module with actual error handling
-def get_measurement(angle: float) -> float:
-    result = requests.get('http://localhost:8000/measure', params={'angle': angle})
-    return float(result.text)
+def get_measurement_data():
+    if call_server.status_up() == False:
+        print('Server reported as unavailable.')
+    else:
+        return measure.voltages_by_angle(call_server.get_measurement)
 
 def print_measurement_data(measurements):
     optimal_angle = measure.max_voltage_angle(measurements)
@@ -19,7 +20,7 @@ def print_measurement_data(measurements):
 def plot_measurement_data(measurements):
     measure.plot_with_gaussian_fit(measurements)
 
-
-measurements = measure.voltages_by_angle(get_measurement)
-print_measurement_data(measurements)
-plot_measurement_data(measurements)
+measurements = get_measurement_data()
+if measurements:
+    print_measurement_data(measurements)
+    plot_measurement_data(measurements)
