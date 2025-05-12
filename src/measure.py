@@ -27,21 +27,19 @@ def voltages_by_angle(get_measurement: Callable[[float], float]) -> list[tuple[f
     PEAK_SEARCH_RADIUS = 30
     PEAK_STEP_SIZE = 10
 
-    def check_angle(angle, measurements):
-        if angle >= MAX_SEARCH_ANGLE:
-            return measurements
-        trial_point = (angle, get_measurement(angle))
-        if trial_point[1] > PEAK_FOUND_THRESHOLD:
-            return search_near(angle, measurements)
-        else:
-            measurements.append(trial_point)
-            return check_angle(angle + ANGLE_STEP, measurements)
-
-    def search_near(angle, measurements):
-        return measurements + [(angle, get_measurement(angle)) for angle in range(
+    def search_near(angle):
+        return [(angle, get_measurement(angle)) for angle in range(
             angle - PEAK_SEARCH_RADIUS, angle + PEAK_SEARCH_RADIUS, PEAK_STEP_SIZE)]
 
-    return check_angle(0, [])
+    measurements: list[tuple[float, float]] = []
+    for angle in range(0, 360, ANGLE_STEP):
+        trial_point = (angle, get_measurement(angle))
+        if trial_point[1] > PEAK_FOUND_THRESHOLD:
+            return measurements + search_near(angle)
+        else:
+            measurements.append(trial_point)
+
+    return measurements
 
 def max_voltage(voltages_by_angle: list[tuple[float, float]]) -> float:
     return max(voltages_by_angle, key=lambda m: m[1])[1]
