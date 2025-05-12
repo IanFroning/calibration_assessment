@@ -21,18 +21,21 @@ def voltages_by_angle(get_measurement: Callable[[float], float]) -> list[tuple[f
     4. The distribution's amplitude is between 10 and 100 V
     5. The distribution's baseline is between 0 and 10 V.
     """
-    MAX_SEARCH_ANGLE = 360
-    PEAK_FOUND_THRESHOLD = 40
+    MIN_ANGLE = 0
+    MAX_ANGLE = 360
     ANGLE_STEP = 30
+    PEAK_FOUND_THRESHOLD = 40
     PEAK_SEARCH_RADIUS = 30
     PEAK_STEP_SIZE = 10
 
     def search_near(angle):
         return [(angle, get_measurement(angle)) for angle in range(
-            angle - PEAK_SEARCH_RADIUS, angle + PEAK_SEARCH_RADIUS, PEAK_STEP_SIZE)]
+            max(MIN_ANGLE, angle - PEAK_SEARCH_RADIUS),
+            min(MAX_ANGLE, angle + PEAK_SEARCH_RADIUS),
+            PEAK_STEP_SIZE)]
 
     measurements: list[tuple[float, float]] = []
-    for angle in range(0, 360, ANGLE_STEP):
+    for angle in range(MIN_ANGLE, MAX_ANGLE, ANGLE_STEP):
         trial_point = (angle, get_measurement(angle))
         if trial_point[1] > PEAK_FOUND_THRESHOLD:
             return measurements + search_near(angle)
